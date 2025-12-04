@@ -15,38 +15,38 @@
         <URL value="@productoform.css" />
     </stylesheets>
    <children>
-      <Button fx:id="btnGuardar" layoutX="237.0" layoutY="474.0" mnemonicParsing="false" onAction="#handleGuardarProducto" prefHeight="42.0" prefWidth="150.0" text="Guardar" />
-      <Button fx:id="btnCancelar" layoutX="400.0" layoutY="474.0" mnemonicParsing="false" onAction="#handleCancelar" prefHeight="42.0" prefWidth="150.0" text="Cancelar" />
-      <Label layoutX="232.0" layoutY="307.0" text="Nombre">
+      <Button fx:id="btnGuardar" layoutX="243.0" layoutY="445.0" mnemonicParsing="false" onAction="#handleGuardarProducto" prefHeight="42.0" prefWidth="150.0" text="Guardar" />
+      <Button fx:id="btnCancelar" layoutX="406.0" layoutY="445.0" mnemonicParsing="false" onAction="#handleCancelar" prefHeight="42.0" prefWidth="150.0" text="Cancelar" />
+      <Label layoutX="238.0" layoutY="278.0" text="Nombre">
          <font>
             <Font name="Segoe UI" size="12.0" />
          </font>
       </Label>
-      <Label layoutX="233.0" layoutY="345.0" text="Precio">
+      <Label layoutX="239.0" layoutY="316.0" text="Precio">
          <font>
             <Font name="Segoe UI" size="12.0" />
          </font>
       </Label>
-      <Label layoutX="406.0" layoutY="345.0" text="Cantidad">
+      <Label layoutX="412.0" layoutY="316.0" text="Cantidad">
          <font>
             <Font name="Segoe UI" size="12.0" />
          </font>
       </Label>
-      <Label layoutX="233.0" layoutY="387.0" text="Departamento">
+      <Label layoutX="239.0" layoutY="358.0" text="Departamento">
          <font>
             <Font name="Segoe UI" size="12.0" />
          </font>
       </Label>
-      <Label layoutX="233.0" layoutY="428.0" text="Almacén">
+      <Label layoutX="239.0" layoutY="399.0" text="Almacén">
          <font>
             <Font name="Segoe UI" size="12.0" />
          </font>
       </Label>
-      <TextField fx:id="txtNombre" layoutX="289.0" layoutY="303.0" prefHeight="25.0" prefWidth="269.0" />
-      <TextField fx:id="txtPrecio" layoutX="289.0" layoutY="343.0" prefHeight="25.0" prefWidth="85.0" />
-      <TextField fx:id="txtCantidad" layoutX="470.0" layoutY="343.0" prefHeight="25.0" prefWidth="85.0" />
-      <ComboBox fx:id="cmbDepartamento" layoutX="330.0" layoutY="383.0" prefHeight="25.0" prefWidth="224.0" />
-      <ComboBox fx:id="cmbAlmacen" layoutX="330.0" layoutY="424.0" prefHeight="25.0" prefWidth="224.0" />
+      <TextField fx:id="txtNombre" layoutX="295.0" layoutY="274.0" prefHeight="25.0" prefWidth="269.0" />
+      <TextField fx:id="txtPrecio" layoutX="295.0" layoutY="314.0" prefHeight="25.0" prefWidth="85.0" />
+      <TextField fx:id="txtCantidad" layoutX="476.0" layoutY="314.0" prefHeight="25.0" prefWidth="85.0" />
+      <ComboBox fx:id="cmbDepartamento" layoutX="336.0" layoutY="354.0" prefHeight="25.0" prefWidth="224.0" />
+      <ComboBox fx:id="cmbAlmacen" layoutX="336.0" layoutY="395.0" prefHeight="25.0" prefWidth="224.0" />
       <ImageView fitHeight="186.0" fitWidth="193.0" layoutX="307.0" layoutY="23.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@CompUson.png" />
@@ -57,11 +57,5 @@
             <Font name="Segoe UI Bold" size="16.0" />
          </font>
       </Label>
-      <Label layoutX="362.0" layoutY="273.0" text="ID">
-         <font>
-            <Font name="Segoe UI" size="12.0" />
-         </font>
-      </Label>
-      <TextField fx:id="txtID" layoutX="383.0" layoutY="268.0" prefHeight="25.0" prefWidth="44.0" />
    </children>
 </AnchorPane>

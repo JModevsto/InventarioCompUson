@@ -21,7 +21,7 @@ public class AlmacenesController {
     // --- 1. INYECCIÓN DE LA TABLA Y LAS 5 COLUMNAS ---
     @FXML private TableView<Almacen> tblAlmacenes;
     // CORRECCIÓN: El ID se maneja como StringProperty en el modelo, por lo que debe ser String.
-    @FXML private TableColumn<Almacen, String> colID; 
+    @FXML private TableColumn<Almacen, String> colID;	
     @FXML private TableColumn<Almacen, String> colNombre;
     @FXML private TableColumn<Almacen, String> colFechaCreacion;
     @FXML private TableColumn<Almacen, String> colFechaModificacion;
@@ -36,25 +36,25 @@ public class AlmacenesController {
     @FXML private HBox bottomBar;
     @FXML private Button btnAgregar;
     @FXML private Button btnModificar;
-    @FXML private Button btnEliminar; 
+    @FXML private Button btnEliminar;	
     @FXML private Button btnVolver;
 
     // ------------------------------------------------------------------
-    //                          MÉTODOS DE INICIALIZACIÓN Y CONFIGURACIÓN
+    //                          MÉTODOS DE INICIALIZACIÓN Y CONFIGURACIÓN
     // ------------------------------------------------------------------
 
     @FXML
     public void initialize() {
         // 1. Configurar ComboBox de Almacenes con todos los nombres disponibles
         try {
-            // ERROR SOLUCIONADO: Ahora DatabaseManager tiene obtenerNombresAlmacenes()
-            List<String> nombresAlmacenes = DatabaseManager.obtenerNombresAlmacenes(); 
+            // Se asume que AlmacenUtils.recargarCacheAlmacenes() ya se llamó en el bloque estático de AlmacenUtils.
+            List<String> nombresAlmacenes = AlmacenUtils.getNombresAlmacenes(); 
             nombresAlmacenes.add(0, "TODOS");
             cmbAlmacenFiltro.setItems(javafx.collections.FXCollections.observableArrayList(nombresAlmacenes));
             cmbAlmacenFiltro.getSelectionModel().selectFirst();
         // CATCH CORREGIDO: Maneja la SQLException que lanza el método de la DB
-        } catch (SQLException e) { 
-            mostrarAlertaError("Error de DB", "No se pudieron cargar los nombres de almacenes para el filtro.");
+        } catch (Exception e) { // Usamos Exception por si hay otros errores de inicialización
+            mostrarAlertaError("Error de Carga", "No se pudieron cargar los nombres de almacenes para el filtro.");
             e.printStackTrace();
         }
 
@@ -101,7 +101,7 @@ public class AlmacenesController {
         colID.setComparator((s1, s2) -> {
             try {
                 // SOLUCIONADO: Ahora compara Strings. El error de compareTo desaparece.
-                return Integer.compare(Integer.parseInt(s1), Integer.parseInt(s2)); 
+                return Integer.compare(Integer.parseInt(s1), Integer.parseInt(s2));	
             } catch (NumberFormatException e) {
                 return s1.compareTo(s2);
             }
@@ -115,14 +115,14 @@ public class AlmacenesController {
     private void handleVolverInicio(ActionEvent event) {
         try {
             // Asegúrate de usar la referencia completa a la clase InventarioApp
-            mx.unison.InventarioApp.mostrarVista("Inicio.fxml"); 
+            mx.unison.InventarioApp.mostrarVista("Inicio.fxml");	
         } catch (IOException e) {
             System.err.println("Error al regresar a la vista de Inicio: " + e.getMessage());
         }
     }
     
     // ------------------------------------------------------------------
-    //                          MÉTODOS DE DATOS Y FILTROS
+    //                          MÉTODOS DE DATOS Y FILTROS
     // ------------------------------------------------------------------
 
     /**
@@ -130,11 +130,11 @@ public class AlmacenesController {
      */
     @FXML
     private void handleAplicarFiltros() {
-        String id = txtID.getText().trim().isEmpty() ? null : txtID.getText().trim(); 
+        String id = txtID.getText().trim().isEmpty() ? null : txtID.getText().trim();	
         String nombre = cmbAlmacenFiltro.getSelectionModel().getSelectedItem();
         
         // Si se selecciona "TODOS", el nombre es nulo para la consulta de DB.
-        String filtroNombre = "TODOS".equalsIgnoreCase(nombre) ? null : nombre; 
+        String filtroNombre = "TODOS".equalsIgnoreCase(nombre) ? null : nombre;	
 
         // Los filtros son [nombre, id]
         List<String> filtros = Arrays.asList(filtroNombre, id);
@@ -151,7 +151,7 @@ public class AlmacenesController {
             ObservableList<Almacen> almacenes = DatabaseManager.obtenerAlmacenesFiltrados(filtros);
             tblAlmacenes.setItems(almacenes);
         // CATCH CORREGIDO: Maneja la SQLException que lanza el método de la DB
-        } catch (SQLException e) { 
+        } catch (SQLException e) {	
             System.err.println("Error al cargar almacenes desde la base de datos.");
             e.printStackTrace();
             mostrarAlertaError("Error de Conexión", "No se pudieron cargar los datos de almacenes. " + e.getMessage());
@@ -159,21 +159,26 @@ public class AlmacenesController {
     }
 
     // ------------------------------------------------------------------
-    //                          MÉTODOS DE ACCIÓN (CRUD)
+    //                          MÉTODOS DE ACCIÓN (CRUD)
     // ------------------------------------------------------------------
     
     /** Abre el formulario para agregar un nuevo almacén. */
     @FXML
     private void handleAgregarAlmacen() {
         try {
-            // ERROR SOLUCIONADO: Se asume que InventarioApp tiene mostrarFormularioAlmacen(Almacen a)
-            mx.unison.InventarioApp.mostrarFormularioAlmacen(null); 
-            cargarDatosAlmacenes(null); 
+            // Abre el formulario modal (InventarioApp.mostrarFormularioAlmacen debe usar showAndWait())
+            mx.unison.InventarioApp.mostrarFormularioAlmacen(null);	
+            
+            // LLAMADA CRUCIAL: Recargar caché después de que el formulario se cierra (y presumiblemente guarda)
+            AlmacenUtils.recargarCacheAlmacenes(); 
+            
+            // Refresca la tabla local
+            cargarDatosAlmacenes(null);	
         // CATCH CORREGIDO: Maneja la IOException
-        } catch (IOException e) { 
-            System.err.println("Error al cargar la vista de formulario de Agregar Almacén.");
+        } catch (IOException | SQLException e) { // Añadimos SQLException por si falla la recarga
+            System.err.println("Error al cargar la vista de formulario de Agregar Almacén o al refrescar la caché.");
             e.printStackTrace();
-            mostrarAlertaError("Error de Vista", "No se pudo abrir el formulario de almacén.");
+            mostrarAlertaError("Error de Operación", "No se pudo completar la operación de agregar almacén: " + e.getMessage());
         }
     }
 
@@ -184,14 +189,19 @@ public class AlmacenesController {
         
         if (almacenSeleccionado != null) {
             try {
-                // ERROR SOLUCIONADO: Se asume que InventarioApp tiene mostrarFormularioAlmacen(Almacen a)
+                // Abre el formulario modal (InventarioApp.mostrarFormularioAlmacen debe usar showAndWait())
                 mx.unison.InventarioApp.mostrarFormularioAlmacen(almacenSeleccionado);
+                
+                // LLAMADA CRUCIAL: Recargar caché después de que el formulario se cierra (y presumiblemente guarda)
+                AlmacenUtils.recargarCacheAlmacenes(); 
+                
+                // Refresca la tabla local
                 cargarDatosAlmacenes(null);
-            // CATCH CORREGIDO: Maneja la IOException
-            } catch (IOException e) { 
-                System.err.println("Error al cargar la vista de formulario de Modificar Almacén.");
+            // CATCH CORREGIDO: Maneja la IOException y SQLException
+            } catch (IOException | SQLException e) {	
+                System.err.println("Error al cargar la vista de formulario de Modificar Almacén o al refrescar la caché.");
                 e.printStackTrace();
-                mostrarAlertaError("Error de Vista", "No se pudo abrir el formulario de almacén.");
+                mostrarAlertaError("Error de Operación", "No se pudo completar la operación de modificar almacén: " + e.getMessage());
             }
         } else {
             mostrarAlertaAdvertencia("Sin Selección", "Por favor, selecciona un almacén de la tabla para modificarlo.");
@@ -205,19 +215,28 @@ public class AlmacenesController {
         if (almacenSeleccionado != null) {
             
             Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-            confirm.setTitle("Confirmar Eliminación");
+            confirm.setTitle("Confirmar Eliminación Masiva");
             confirm.setHeaderText("Eliminar Almacén: " + almacenSeleccionado.getNombre());
-            confirm.setContentText("¿Está seguro de que desea eliminar el almacén con ID: " + almacenSeleccionado.getId() + "? Esta acción no se puede deshacer.");
+            
+            // TEXTO DE ADVERTENCIA ACTUALIZADO
+            confirm.setContentText(
+                "ADVERTENCIA: Todos los productos relacionados con este almacén serán ELIMINADOS permanentemente." +
+                "\n\n¿Desea proceder con la eliminación del almacén con ID: " + almacenSeleccionado.getId() + "?"
+            );
 
             confirm.showAndWait().ifPresent(response -> {
                 if (response == ButtonType.OK) {
                     try {
-                        // ERROR SOLUCIONADO: Ahora DatabaseManager tiene eliminarAlmacen(String id)
+                        // DB Operation
                         DatabaseManager.eliminarAlmacen(almacenSeleccionado.getId());
-                        mostrarAlertaInfo("Éxito", "El almacén fue eliminado correctamente.");
-                        cargarDatosAlmacenes(null); 
+                        
+                        // LLAMADA CRUCIAL: Recargar caché inmediatamente después de la eliminación
+                        AlmacenUtils.recargarCacheAlmacenes(); 
+                        
+                        mostrarAlertaInfo("Éxito", "El almacén fue eliminado y la caché refrescada correctamente.");
+                        cargarDatosAlmacenes(null);	
                     // CATCH CORREGIDO: Maneja la SQLException
-                    } catch (SQLException e) { 
+                    } catch (SQLException e) {	
                         mostrarAlertaError("Error de DB", "No se pudo eliminar el almacén: " + e.getMessage());
                         e.printStackTrace();
                     }
@@ -229,7 +248,7 @@ public class AlmacenesController {
     }
     
     // ------------------------------------------------------------------
-    //                          MÉTODOS DE UTILIDAD
+    //                          MÉTODOS DE UTILIDAD
     // ------------------------------------------------------------------
     
     private void mostrarAlertaError(String titulo, String contenido) {

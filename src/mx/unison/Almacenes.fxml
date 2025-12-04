@@ -30,10 +30,10 @@
       <TableView fx:id="tblAlmacenes" layoutX="12.0" layoutY="82.0" prefHeight="417.0" prefWidth="777.0">
         <columns>
           <TableColumn fx:id="colID" prefWidth="26.0" text="ID" />
-          <TableColumn fx:id="colNombre" prefWidth="186.0" text="Nombre" />
-            <TableColumn fx:id="colFechaCreacion" prefWidth="70.0" text="Creación" />
-            <TableColumn fx:id="colFechaModificacion" prefWidth="111.0" text="Ult. Modificación" />
-            <TableColumn fx:id="colUltimoUsuario" prefWidth="93.0" text="Ult. Usuario" />
+          <TableColumn fx:id="colNombre" prefWidth="380.0" text="Nombre" />
+            <TableColumn fx:id="colFechaCreacion" minWidth="0.0" prefWidth="113.0" text="Creación" />
+            <TableColumn fx:id="colFechaModificacion" prefWidth="109.0" text="Ult. Modificación" />
+            <TableColumn fx:id="colUltimoUsuario" minWidth="0.0" prefWidth="146.0" text="Ult. Usuario" />
         </columns>
       </TableView>
       <Button fx:id="btnVolver" layoutX="23.0" layoutY="28.0" mnemonicParsing="false" onAction="#handleVolverInicio" prefHeight="31.0" prefWidth="73.0" text="Volver">

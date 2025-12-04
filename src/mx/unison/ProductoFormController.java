@@ -12,7 +12,7 @@ public class ProductoFormController {
 
     // --- Inyecciones FXML ---
     @FXML private Label lblTitulo;
-    @FXML private TextField txtID;
+    // ELIMINADO: @FXML private TextField txtID;
     @FXML private TextField txtNombre;
     @FXML private TextField txtPrecio;
     @FXML private TextField txtCantidad;
@@ -34,8 +34,7 @@ public class ProductoFormController {
         // Inicializar ComboBoxes con datos fijos y de la utilidad
         cargarComboBoxes();
         
-        // El ID debe ser ineditable por defecto y habilitarse solo si es Agregar
-        txtID.setEditable(false);
+        // ELIMINADO: txtID.setEditable(false);
     }
     
     /**
@@ -49,6 +48,7 @@ public class ProductoFormController {
         
         try {
             // Intenta obtener los nombres de los almacenes desde la base de datos
+            // Nota: Aquí se asume que DatabaseManager.obtenerNombresAlmacenes() llama a AlmacenUtils.getNombresAlmacenes()
             List<String> nombresAlmacenes = DatabaseManager.obtenerNombresAlmacenes();
             cmbAlmacen.setItems(FXCollections.observableArrayList(nombresAlmacenes));
             System.out.println("ComboBoxes de almacenes cargados con éxito.");
@@ -79,7 +79,7 @@ public class ProductoFormController {
             btnGuardar.setText("Actualizar");
             
             // Llenar los campos con los datos del producto
-            txtID.setText(producto.getId());
+            // txtID.setText(producto.getId()); // Eliminamos la referencia a txtID
             txtNombre.setText(producto.getNombre());
             txtPrecio.setText(producto.getPrecio());
             txtCantidad.setText(producto.getCantidad());
@@ -91,8 +91,8 @@ public class ProductoFormController {
             String nombreAlmacen = AlmacenUtils.getNombreAlmacen(producto.getAlmacen());
             cmbAlmacen.getSelectionModel().select(nombreAlmacen);
             
-            // En modo modificación, el ID no se puede cambiar
-            txtID.setDisable(true); 
+            // En modo modificación, el ID no se puede cambiar (ya no es necesario, pero lo mantenemos para referencia)
+            // txtID.setDisable(true); 
             
         } else {
             // Modo AGREGAR
@@ -100,9 +100,8 @@ public class ProductoFormController {
             lblTitulo.setText("Agregar Nuevo Producto");
             btnGuardar.setText("Guardar");
             
-            // En modo agregar, el ID debe ser editable
-            txtID.setDisable(false);
-            txtID.setEditable(true);
+            // ELIMINADO: txtID.setDisable(false);
+            // ELIMINADO: txtID.setEditable(true);
         }
     }
 
@@ -124,33 +123,28 @@ public class ProductoFormController {
      */
     @FXML
     private void handleGuardarProducto() {
-        // 1. Validar campos obligatorios
+        // 1. Validar campos obligatorios (sin incluir ID para Agregar)
         if (!validarCampos()) {
             return; // Detiene el proceso si hay errores de validación
         }
         
-        // 2. Obtener el ID ingresado/existente
-        String idIngresado = txtID.getText().trim();
+        // 2. Obtener el ID existente (solo en modificación) o null (en agregar)
+        String idExistente = esModificacion ? productoEnEdicion.getId() : null;
 
         try {
-            // 3. VALIDACIÓN DE UNICIDAD DEL ID (SOLO EN MODO AGREGAR)
-            if (!esModificacion) {
-                if (DatabaseManager.productoIdExiste(idIngresado)) {
-                    mostrarAlertaError("ID Duplicado", "El ID de producto " + idIngresado + " ya existe. Por favor, ingrese un ID único.");
-                    return; // Detiene el proceso si el ID ya está en uso
-                }
-            }
+            // 3. VALIDACIÓN DE UNICIDAD DEL ID ELIMINADA. La DB se encargará del auto-incremento.
             
             // 4. Construir el objeto Producto
-            Producto productoAGuardar = construirProducto(idIngresado);
+            Producto productoAGuardar = construirProducto(idExistente);
 
-            // 5. LLAMADA A LA BASE DE DATOS (IMPLEMENTADO EN DatabaseManager)
+            // 5. LLAMADA A LA BASE DE DATOS
             if (esModificacion) {
                 DatabaseManager.actualizarProducto(productoAGuardar);
-                mostrarAlertaInfo("Éxito", "El producto ID " + idIngresado + " ha sido **modificado** exitosamente.");
+                mostrarAlertaInfo("Éxito", "El producto ID " + idExistente + " ha sido **modificado** exitosamente.");
             } else {
+                // En modo AGREGAR, la DB genera el ID
                 DatabaseManager.agregarProducto(productoAGuardar);
-                mostrarAlertaInfo("Éxito", "El nuevo producto ID " + idIngresado + " ha sido **guardado** con éxito.");
+                mostrarAlertaInfo("Éxito", "El nuevo producto ha sido **guardado** con éxito.");
             }
             
             // 6. Si todo fue bien, cerrar el formulario
@@ -182,7 +176,7 @@ public class ProductoFormController {
         
         // Creamos un nuevo objeto Producto con los datos actuales del formulario
         return new Producto(
-            id,
+            id, // Será null si es Agregar, o el ID existente si es Modificar
             txtNombre.getText().trim(),
             txtPrecio.getText().trim(),
             txtCantidad.getText().trim(),
@@ -191,20 +185,18 @@ public class ProductoFormController {
             // Los siguientes campos se inicializan vacíos ya que se llenarán o actualizarán en la DB
             "", // fechaCreacion
             "", // fechaModificacion
-            ""  // ultimoUsuario
+            ""	// ultimoUsuario
         );
     }
     
     /**
      * Valida que los campos requeridos no estén vacíos y que los campos numéricos sean válidos.
+     * (El campo ID es excluido de esta validación para el modo Agregar)
      */
     private boolean validarCampos() {
         String errorMsg = "";
         
-        // Validación de ID (Solo si es Agregar)
-        if (!esModificacion && txtID.getText().trim().isEmpty()) {
-            errorMsg += "El ID del producto no puede estar vacío.\n";
-        }
+        // ELIMINADA la validación de ID para modo Agregar
         
         // Validación de Nombre
         if (txtNombre.getText().trim().isEmpty()) {
@@ -252,7 +244,7 @@ public class ProductoFormController {
     private void mostrarAlertaError(String titulo, String contenido) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(titulo);
-        alert.setHeaderText(null); 
+        alert.setHeaderText(null);	
         alert.setContentText(contenido);
         alert.showAndWait();
     }
@@ -260,7 +252,7 @@ public class ProductoFormController {
     private void mostrarAlertaInfo(String titulo, String contenido) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(titulo);
-        alert.setHeaderText(null); 
+        alert.setHeaderText(null);	
         alert.setContentText(contenido);
         alert.showAndWait();
     }
