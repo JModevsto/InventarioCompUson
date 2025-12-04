@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ProgramaBD-PA" default="default" basedir=".">
+    <description>Builds, tests, and runs the project ProgramaBD-PA.</description>
+    <!-- Importa los targets de construcción predeterminados de NetBeans (CRÍTICO) -->
+    <import file="nbproject/build-impl.xml"/>
+    
+<!-- =================================================================== -->
+<!-- Tarea para crear un instalador nativo usando jpackage (JDK 14+)   -->
+<!-- =================================================================== -->
+<!-- Dependemos de 'jar' para garantizar que 'dist' esté poblado. -->
+<target name="jpackage-app" depends="jar">
+    <description>Empaqueta la aplicación como un instalador nativo (.exe o .msi).</description>
+
+    <!-- PROPIEDADES CLAVE -->
+    <property name="app.name" value="SistemaInventarioUNISON"/>
+    <property name="jar.name" value="ProgramaBD-PA.jar"/> 
+    <property name="app.main.class" value="mx.unison.InventarioApp"/>
+    <property name="app.version" value="1.0"/>
+    <property name="package.type" value="exe"/> 
+    <property name="jpackage.output.dir" value="dist/jpackage"/>
+    <property name="lib.dir" value="${dist.dir}/lib"/>
+
+
+    <echo message="Creando paquete nativo '${app.name}' con jpackage..."/>
+    <mkdir dir="${jpackage.output.dir}"/>
+
+    <exec executable="${java.home}/bin/jpackage" failonerror="true">
+        
+        <!-- *** MODO VERBOSO: Útil para ver el proceso *** -->
+        <arg value="--verbose"/> 
+        
+        <arg value="--name"/>
+        <arg value="${app.name}"/>
+
+        <arg value="--app-version"/>
+        <arg value="${app.version}"/>
+        
+        <!-- Clase principal que jpackage debe ejecutar -->
+        <arg value="--main-class"/>
+        <arg value="${app.main.class}"/>
+
+        <!-- ARGUMENTOS REQUERIDOS -->
+        <arg value="--input"/>
+        <arg value="${dist.dir}"/>
+        <arg value="--main-jar"/>
+        <arg value="${jar.name}"/> 
+        
+        <!-- Ruta donde jpackage debe buscar los módulos de terceros (JavaFX y SQLite) -->
+        <!-- ESTO REEMPLAZA AL CLASSPATH OBSOLETO: Todos los JARs en 'lib' se consideran módulos aquí. -->
+        <arg value="--module-path"/>
+        <arg value="${lib.dir}"/>
+        
+        <!-- Módulos que jpackage debe enlazar al JRE nativo (incluyendo el driver SQLite) -->
+        <arg value="--add-modules"/>
+        <arg value="javafx.controls,javafx.fxml,javafx.graphics,java.sql,org.xerial.sqlitejdbc"/>
+        
+        <!-- Directorio de salida -->
+        <arg value="--dest"/>
+        <arg value="${jpackage.output.dir}"/>
+
+        <!-- Tipo de instalador (exe) -->
+        <arg value="--type"/>
+        <arg value="${package.type}"/>
+
+        <!-- Opcional: Agregar información del desarrollador/vendor -->
+        <arg value="--vendor"/>
+        <arg value="UNISON"/>
+        
+    </exec>
+
+    <echo message="¡Instalador creado en: ${jpackage.output.dir}!"/>
+</target>
+
+</project>

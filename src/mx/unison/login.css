@@ -1,0 +1,29 @@
+/* 1. TIPOGRAFÍA GLOBAL: Selecciona *todos* los elementos para Segoe UI */
+* {
+    -fx-font-family: "Segoe UI";
+}
+
+/* 2. CAMPOS DE TEXTO: Bordes redondeados de 4px */
+.text-field, .password-field {
+    /* Fondo redondeado */
+    -fx-background-radius: 4; 
+    /* Borde redondeado */
+    -fx-border-radius: 4;
+}
+
+/* 3. BOTONES: Bordes redondeados de 4px y estilo Unison */
+.button {
+    /* Bordes redondeados de 4px para fondo y borde */
+    -fx-background-radius: 4;
+    -fx-border-radius: 4;
+    
+    /* Colores Unison */
+    -fx-background-color: #f8bb00; /* Dorado Unison */
+    -fx-text-fill: black;
+    -fx-font-weight: bold;
+}
+/* La clase .mainFxmlClass puedes eliminarla o usarla solo para el fondo de esa vista */
+.mainFxmlClass {
+    /* Ejemplo de fondo para el contenedor principal de la vista de Login */
+    /* -fx-background-color: #00529e; */
+}
